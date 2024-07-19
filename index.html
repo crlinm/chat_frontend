@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="forms">
+            <img src="https://cdn.iconscout.com/icon/free/png-256/free-chat-2639493-2187526.png?f=webp" alt="">
+            
+            <form class="login-form hide">
+                <h4>Login</h4>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore, corporis.</p>
+                <p class="login-invalid-message hide">Incorrect login or password. Please try again.</p>
+                <div class="inputs-form">
+                    <input type="email" class="login-email" placeholder="email">
+                    <input type="password" class="login-password" placeholder="password">
+                    <button class="login-btn">Login</button>
+                </div>
+
+                <span class="toggle-btn toggle-login">Create an account</span>
+
+            </form>
+
+            <form class="register-form">
+                <h4>Register</h4>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore, corporis.</p>
+                <p class="register-invalid-message hide">Register user already exists.</p>
+                <div class="inputs-form">
+                    <input type="email" class="register-email" placeholder="email">
+                    <input type="password" class="register-password" placeholder="password">
+                    <button class="register-btn">Register</button>
+                </div>
+
+                <span class="toggle-btn toggle-register">Have you already an account?</span>
+
+            </form>
+
+        </div>
+
+
+        <div class="chats-list hide">
+            <div class="chats-list-item">
+                <div class="info">
+                    <img src="https://cdn-icons-png.flaticon.com/512/9187/9187604.png" alt="">
+                    <span class="user-name">User name</span>
+                </div>
+                <div class="status hide"></div>
+            </div>
+        </div>
+
+
+        <div class="chat-container hide">
+            <button class="chat-back-btn">Back</button>
+            <div class="messages-list">
+                <div class="message user-message">Hello</div>
+                <div class="message my-message">Hello</div>
+            </div>
+            <div class="message-form">
+                <input type="text" class="message-input">
+                <button class="message-send">Send</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
