@@ -155,6 +155,7 @@
     display: flex;
     align-items: center;
     width: 100%;
+    position: relative;
 }
 
 .message-form input{
@@ -176,6 +177,43 @@
 .message-form button:hover{
     background-color: #1E68D7;
     color: white;
+}
+
+.chat-back-btn{
+    height: 25px;
+}
+
+.message-form .open-emoji {
+    padding: 0;
+    width: auto;
+    border: 0;
+
+    position: absolute;
+    left: 5px;
+}
+
+.emoji-list {
+    position: absolute;
+    width: 100%;
+    height: 150px;;
+    background-color: gray;
+
+    left: 0;
+    top: 0;
+    transform: translateY(-100%);
+
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.emoji-list span{
+    width: 20px;
 }
 
 .hide{

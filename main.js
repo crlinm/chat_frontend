@@ -27,12 +27,19 @@ const openChatBtn = document.querySelector(".chats-list-item");
 const messageInput = document.querySelector(".message-input");
 const messageSendBtn = document.querySelector(".message-send");
 const messagesList = document.querySelector(".messages-list");
+const messagesForm = document.querySelector(".messages-form");
 
-const SERVER_URL = "http://127.0.0.1:3030";
-const SERVER_IP = "127.0.0.1:3030";
+const emojiList = document.querySelector(".emoji-list");
+const openEmojiBtn = document.querySelector(".open-emoji");
 
 
-const MY_USER_ID = 888;
+const SERVER_URL = "https://chat.crlinm.com";
+const SERVER_IP = "chat.crlinm.com";
+
+const API_KEY = "83d5d552ff4064d1ae294e1228af86b9bd346eef";
+const EMOJI_API = "https://emoji-api.com";
+
+const MY_USER_ID = 1;
 
 
 async function userRegister(e) {
@@ -54,8 +61,9 @@ async function userRegister(e) {
     });
 
     const data = await res.json();
+
     if (!res.ok) {
-        if (res.status == 422) {
+        if (res.status === 422) {
             registerInvalidMessage.textContent = "Check your inputs";
         }
         else {
@@ -83,14 +91,18 @@ async function userLogin(e){
 
     if (res.ok) {
         const data = await res.json();
+
         localStorage.setItem("token", data.access_token);
+
         formsContainer.classList.add("hide");
+        chatsListContainer.classList.remove("hide");
+
         return data;
     }
     else {
         console.log(res.status);
-        console.log(JSON.stringify(res.json().details));
-        if (res.status == 422) {
+
+        if (res.status === 422) {
             loginInvalidMessage.textContent = "Check your inputs";
         }
         else {
@@ -110,27 +122,26 @@ function toggleForm(){
 }
 
 async function checkAuthMe() {
-    // e.preventDefault();
 
     const res = await fetch(SERVER_URL + "/auth/users/me", {
         method: "GET", 
         headers: {
-            "Autorization": `Bearer ${localStorage.getItem("token")}`,
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
         }
     });
 
     const data = await res.json();
+
     if (res.status === 401) {
-        chatsListContainer.classList.add("hide");
         chatContainer.classList.add("hide");
+        chatsListContainer.classList.add("hide");
 
         formsContainer.classList.remove("hide");
-        registerForm.classList.remove("hide");
+        loginForm.classList.remove("hide");
 
         localStorage.removeItem("token");
     }
 
-    console.log(res);
 }
 
 function goToChatsList(){
@@ -141,15 +152,21 @@ function goToChatsList(){
 function goToChat() {
     const userID = +prompt("Enter person id: ");
 
+    if (!userID) {
+        return;
+    }
+
     chatContainer.classList.remove("hide");
     chatsListContainer.classList.add("hide");
 
-    const ws = new WebSocket(`ws://${SERVER_IP}/ws/${MY_USER_ID}`);
+    const ws = new WebSocket(`wss://${SERVER_IP}/ws/${MY_USER_ID}`);
 
-    ws.unopen = function(){
+    ws.onopen = function(){
         console.log("open");
 
-        messageSendBtn.addEventListener("click", function(){
+        messagesForm.addEventListener("submit", function(e){
+            e.preventDefault()
+
             const messageText = messageInput.value;
             
             ws.send(`${userID}: ${messageText}`);
@@ -158,6 +175,8 @@ function goToChat() {
             message.textContent = messageText;
 
             messagesList.append(message);
+
+            messageInput.value = "";
         });
     }
 
@@ -180,6 +199,55 @@ function goToChat() {
     }
 }
 
+async function getEmojiList(){
+    const res = await fetch(EMOJI_API + "/categories/smileys-emotion" + "?access_key=" + API_KEY);
+
+    const data = await res.json();
+
+    if (res.ok) {
+        for (let i = 0; i < data.length; i++) {
+            const emojiElem = document.createElement("span");
+            emojiElem.textContent = data[i].character;
+
+            emojiList.append(emojiElem);
+        }
+    }
+
+    console.log(data);
+}
+
+function toggleEmojiList(e) {
+    e.preventDefault();
+
+    const target = e.target;
+    console.log(target);
+
+    if (target.closest(".open-emoji")) {
+        console.log(123);
+        emojiList.classList.toggle("hide");
+        return;
+    }
+
+    const isOpen = !emojiList.classList.contains("hide");
+
+    if (isOpen && target.closest('.emoji-list')){
+        emojiList.classList.toggle("hide");
+    }
+    emojiList.classList.toggle("hide");
+}
+
+function insertEmoji(e) {
+    e.preventDefault();
+
+    const emoji = e.target;
+    if (emoji.nodeName === "SPAN") {
+        const messageText = messageInput.value;
+        messageInput.value = messageText + emoji.textContent;
+    }
+    console.log(e.target);
+}
+
+
 registerBtn.addEventListener("click", userRegister);
 loginBtn.addEventListener("click", userLogin);
 
@@ -189,16 +257,23 @@ toggleRegisterBtn.addEventListener("click", toggleForm);
 chatBackBtn.addEventListener("click", goToChatsList);
 openChatBtn.addEventListener("click", goToChat);
 
+openEmojiBtn.addEventListener("click", toggleEmojiList);
+emojiList.addEventListener("click", insertEmoji);
+
+// chatContainer.addEventListener("click", toggleEmojiList);
+
+
 async function init(){
     const token = localStorage.getItem("token");
     if (token) {
         formsContainer.classList.add("hide");
-        chatsListContainer.classList.remove("hide");
     }
 
     checkAuthMe();
 
-    loginForm.classList.add("hide");
+    getEmojiList();
+
+    registerForm.classList.add("hide");
 }
 
 init();

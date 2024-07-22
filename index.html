@@ -28,7 +28,7 @@
             <form class="register-form">
                 <h4>Register</h4>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore, corporis.</p>
-                <p class="register-invalid-message hide">Register user already exists.</p>
+                <p class="register-invalid-message hide">Registered user already exists.</p>
                 <div class="inputs-form">
                     <input type="email" class="register-email" placeholder="email">
                     <input type="password" class="register-password" placeholder="password">
@@ -53,16 +53,19 @@
         </div>
 
 
-        <div class="chat-container hide">
+        <div class="chat-container">
             <button class="chat-back-btn">Back</button>
             <div class="messages-list">
                 <div class="message user-message">Hello</div>
                 <div class="message my-message">Hello</div>
             </div>
-            <div class="message-form">
+            <form class="message-form">
                 <input type="text" class="message-input">
-                <button class="message-send">Send</button>
-            </div>
+                <button class="open-emoji">😀</button>
+                <button type="submit" class="message-send">Send</button>
+
+                <div class="emoji-list hide"></div>
+            </form>
         </div>
 
     </div>
