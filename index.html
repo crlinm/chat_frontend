@@ -25,7 +25,7 @@
 
             </form>
 
-            <form class="register-form">
+            <form class="register-form hide">
                 <h4>Register</h4>
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore, corporis.</p>
                 <p class="register-invalid-message hide">Registered user already exists.</p>
@@ -46,7 +46,8 @@
             <div class="chats-list-item">
                 <div class="info">
                     <img src="https://cdn-icons-png.flaticon.com/512/9187/9187604.png" alt="">
-                    <span class="user-name">User name</span>
+                    <span class="user-name" id="my-email">User name
+                    </span>
                 </div>
                 <div class="status hide"></div>
             </div>
@@ -61,7 +62,7 @@
             </div>
             <form class="message-form">
                 <input type="text" class="message-input">
-                <button class="open-emoji">😀</button>
+                <span class="open-emoji">😀</span>
                 <button type="submit" class="message-send">Send</button>
 
                 <div class="emoji-list hide"></div>

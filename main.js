@@ -27,10 +27,12 @@ const openChatBtn = document.querySelector(".chats-list-item");
 const messageInput = document.querySelector(".message-input");
 const messageSendBtn = document.querySelector(".message-send");
 const messagesList = document.querySelector(".messages-list");
-const messagesForm = document.querySelector(".messages-form");
+const messagesForm = document.querySelector(".message-form");
 
 const emojiList = document.querySelector(".emoji-list");
 const openEmojiBtn = document.querySelector(".open-emoji");
+
+const myEmail = document.querySelector("#my-email");
 
 
 const SERVER_URL = "https://chat.crlinm.com";
@@ -131,6 +133,14 @@ async function checkAuthMe() {
     });
 
     const data = await res.json();
+    console.log(res)
+    console.log(data)
+    const token = localStorage.getItem("token");
+    console.log(token)
+
+    if (res.ok) {
+        return data.id;
+    }
 
     if (res.status === 401) {
         chatContainer.classList.add("hide");
@@ -141,7 +151,6 @@ async function checkAuthMe() {
 
         localStorage.removeItem("token");
     }
-
 }
 
 function goToChatsList(){
@@ -149,45 +158,84 @@ function goToChatsList(){
     chatsListContainer.classList.remove("hide");
 }
 
-function goToChat() {
-    const userID = +prompt("Enter person id: ");
+async function createChat(userId) {
+    const res = await fetch(SERVER_URL + "/chat/chats/" + userId, {
+        method: "POST", 
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+    });
 
-    if (!userID) {
+    const data = await res.json();
+
+    return data;
+}
+
+async function goToChat(e) {
+    const target = e.target;
+    console.log(target);
+    
+    if (!target.closest(".chats-list-item")){
+        return;
+    }
+
+    const userId = target.dataset.userId;
+
+    if (!userId) {
         return;
     }
 
     chatContainer.classList.remove("hide");
     chatsListContainer.classList.add("hide");
 
-    const ws = new WebSocket(`wss://${SERVER_IP}/ws/${MY_USER_ID}`);
+    const createdChat = await createChat(userId);
+
+    const ws = new WebSocket(`wss://${SERVER_IP}/chat/ws/${createdChat.id}?token=${localStorage.getItem("token")}`);
 
     ws.onopen = function(){
         console.log("open");
 
         messagesForm.addEventListener("submit", function(e){
             e.preventDefault()
-
             const messageText = messageInput.value;
+            console.log(messageText);
             
-            ws.send(`${userID}: ${messageText}`);
+            ws.send(JSON.stringify({
+                text: messageText,
+            }));
+
             const message = document.createElement("div");
             message.classList.add("message", "my-message");
             message.textContent = messageText;
 
             messagesList.append(message);
-
+            emojiList.classList.add("hide");
             messageInput.value = "";
         });
     }
 
-    ws.onmessage = function(data){
-        const messageText = data.data.split(":")[1];
+    ws.onmessage = async function(data){
+        const messageText = JSON.parse(data.data).message;
+        const myId = await checkAuthMe();
+        console.log(messageText);
 
-        const message = document.createElement("div");
-        message.classList.add("message", "user-message");
-        message.textContent = messageText;
-
-        messagesList.append(message);
+        if (messageText) {
+            for (let i = 0; i < messageText.length; i++){
+                const message = document.createElement("div");
+                if (messageText[i].from_user.id == myId) {
+                    message.classList.add("message", "my-message");
+                } else {
+                    message.classList.add("message", "user-message");
+                }
+                message.textContent = messageText[i].content;
+                messagesList.append(message);
+            }
+        } else {
+            const message = document.createElement("div");
+            message.classList.add("message", "user-message");
+            message.textContent = JSON.parse(data.data).content;
+            messagesList.append(message);
+        }
     }
     
     ws.onerror = function(e){
@@ -212,28 +260,25 @@ async function getEmojiList(){
             emojiList.append(emojiElem);
         }
     }
-
-    console.log(data);
 }
 
 function toggleEmojiList(e) {
     e.preventDefault();
-
-    const target = e.target;
-    console.log(target);
-
-    if (target.closest(".open-emoji")) {
-        console.log(123);
-        emojiList.classList.toggle("hide");
-        return;
-    }
-
-    const isOpen = !emojiList.classList.contains("hide");
-
-    if (isOpen && target.closest('.emoji-list')){
-        emojiList.classList.toggle("hide");
-    }
     emojiList.classList.toggle("hide");
+
+    // const target = e.target;
+
+    // if (target.closest(".open-emoji")) {
+    //     emojiList.classList.toggle("hide");
+    //     return;
+    // }
+
+    // const isOpen = !emojiList.classList.contains("hide");
+
+    // if (isOpen && target.closest('.emoji-list')){
+    //     emojiList.classList.toggle("hide");
+    // }
+    // emojiList.classList.toggle("hide");
 }
 
 function insertEmoji(e) {
@@ -244,7 +289,40 @@ function insertEmoji(e) {
         const messageText = messageInput.value;
         messageInput.value = messageText + emoji.textContent;
     }
-    console.log(e.target);
+}
+
+async function getAllUsers() {
+    const res = await fetch(SERVER_URL + "/auth/all", {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        }
+    });
+
+    const data = await res.json();
+    
+    const myId = await checkAuthMe();
+
+    if (res.ok) {
+        for (let i = 0; i < data.users.length; i++){
+            if (data.users[i].id === myId.id) {
+                continue;
+            }
+            const elem = document.createElement("div");
+            elem.classList.add("chats-list-item");
+            elem.dataset.userId = data.users[i].id;
+
+            // const elemInfo = document.createElement("div");
+            // elemInfo.textContent = data.users[i].email;
+            // elem.append(elemInfo);
+
+            elem.textContent = data.users[i].email;
+
+            chatsListContainer.append(elem);
+        }
+    }
+
+    console.log(data);
 }
 
 
@@ -255,23 +333,29 @@ toggleLoginBtn.addEventListener("click", toggleForm);
 toggleRegisterBtn.addEventListener("click", toggleForm);
 
 chatBackBtn.addEventListener("click", goToChatsList);
-openChatBtn.addEventListener("click", goToChat);
 
-openEmojiBtn.addEventListener("click", toggleEmojiList);
+chatsListContainer.addEventListener("click", goToChat);
+
 emojiList.addEventListener("click", insertEmoji);
 
-// chatContainer.addEventListener("click", toggleEmojiList);
+openEmojiBtn.addEventListener("click", toggleEmojiList);
 
 
 async function init(){
     const token = localStorage.getItem("token");
     if (token) {
         formsContainer.classList.add("hide");
+        chatContainer.classList.add("hide");
+        chatsListContainer.classList.remove("hide");
     }
 
-    checkAuthMe();
+    const checkMe = await checkAuthMe();
+
+    myEmail.textContent = checkMe.email;
 
     getEmojiList();
+
+    getAllUsers();
 
     registerForm.classList.add("hide");
 }
