@@ -41,8 +41,6 @@ const SERVER_IP = "chat.crlinm.com";
 const API_KEY = "83d5d552ff4064d1ae294e1228af86b9bd346eef";
 const EMOJI_API = "https://emoji-api.com";
 
-const MY_USER_ID = 1;
-
 
 async function userRegister(e) {
     e.preventDefault();
@@ -139,7 +137,7 @@ async function checkAuthMe() {
     console.log(token)
 
     if (res.ok) {
-        return data.id;
+        return data;
     }
 
     if (res.status === 401) {
@@ -222,7 +220,7 @@ async function goToChat(e) {
         if (messageText) {
             for (let i = 0; i < messageText.length; i++){
                 const message = document.createElement("div");
-                if (messageText[i].from_user.id == myId) {
+                if (messageText[i].from_user.id === myId.id) {
                     message.classList.add("message", "my-message");
                 } else {
                     message.classList.add("message", "user-message");
