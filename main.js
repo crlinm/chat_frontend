@@ -34,6 +34,12 @@ const openEmojiBtn = document.querySelector(".open-emoji");
 
 const myEmail = document.querySelector("#my-email");
 
+const modalWrapper = document.querySelector(".modal-wrapper");
+const modalBtn = document.querySelector("#modal-btn");
+const modalText = document.querySelector(".modal-heading");
+
+const logoutBtn = document.querySelector(".logout-btn");
+
 
 const SERVER_URL = "https://chat.crlinm.com";
 const SERVER_IP = "chat.crlinm.com";
@@ -70,6 +76,12 @@ async function userRegister(e) {
             registerInvalidMessage.textContent = registerInvalidMessageText;
         }
         registerInvalidMessage.classList.remove("hide");
+    } else {
+        console.log("Successfully registered");
+        modalText.textContent = "Successfully registered";
+        modalWrapper.classList.remove("hide");
+        registerForm.classList.toggle("hide");
+        loginForm.classList.toggle("hide");
     }
     return data;
 }
@@ -93,6 +105,8 @@ async function userLogin(e){
         const data = await res.json();
 
         localStorage.setItem("token", data.access_token);
+
+        window.location.reload();
 
         formsContainer.classList.add("hide");
         chatsListContainer.classList.remove("hide");
@@ -165,7 +179,7 @@ async function createChat(userId) {
     });
 
     const data = await res.json();
-
+    
     return data;
 }
 
@@ -186,9 +200,12 @@ async function goToChat(e) {
     chatContainer.classList.remove("hide");
     chatsListContainer.classList.add("hide");
 
+    messagesList.textContent = "";
+
     const createdChat = await createChat(userId);
 
     const ws = new WebSocket(`wss://${SERVER_IP}/chat/ws/${createdChat.id}?token=${localStorage.getItem("token")}`);
+
 
     ws.onopen = function(){
         console.log("open");
@@ -323,6 +340,18 @@ async function getAllUsers() {
     console.log(data);
 }
 
+function closeModal() {
+    modalWrapper.classList.add("hide");
+}
+
+function logout(){
+    localStorage.removeItem("token");
+    checkAuthMe();
+}
+
+logoutBtn.addEventListener("click", logout);
+
+modalBtn.addEventListener("click", closeModal);
 
 registerBtn.addEventListener("click", userRegister);
 loginBtn.addEventListener("click", userLogin);

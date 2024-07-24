@@ -87,6 +87,7 @@
     text-decoration: underline;
     text-align: center;
     font-size: 12px;
+    cursor: pointer;
 }
 
 .chats-list {
@@ -215,6 +216,49 @@
 .emoji-list span{
     width: 20px;
 }
+
+.modal-wrapper{
+    width: 100vw;
+    height: 100vh;
+    background-color: #232323a6;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    width: 200px;
+    height: 250px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+#modal-btn {
+    background-color: #1E68D7;
+    border: 0;
+    border-radius: 6px;
+    font-size: 18px;
+    color: white;
+    width: 60%;
+    margin: auto;
+}
+
+.modal-heading {
+    text-align: center;
+    font-size: 20px;
+}
+
+/* .logout-btn{
+
+} */
 
 .hide{
     display: none;

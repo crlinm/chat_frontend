@@ -43,6 +43,7 @@
 
 
         <div class="chats-list hide">
+            <button class="logout-btn">Logout</button>
             <div class="chats-list-item">
                 <div class="info">
                     <img src="https://cdn-icons-png.flaticon.com/512/9187/9187604.png" alt="">
@@ -53,11 +54,11 @@
         </div>
 
 
-        <div class="chat-container">
+        <div class="chat-container hide">
             <button class="chat-back-btn">Back</button>
             <div class="messages-list">
-                <div class="message user-message">Hello</div>
-                <div class="message my-message">Hello</div>
+                <div class="message user-message"></div>
+                <div class="message my-message"></div>
             </div>
             <form class="message-form">
                 <input type="text" class="message-input">
@@ -66,6 +67,13 @@
 
                 <div class="emoji-list hide"></div>
             </form>
+        </div>
+
+        <div class="modal-wrapper hide">
+            <div class="modal">
+                <h3 class="modal-heading"></h3>
+                <button id="modal-btn">Ok</button>
+            </div>
         </div>
 
     </div>
