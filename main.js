@@ -20,6 +20,7 @@ const loginInvalidMessage = document.querySelector(".login-invalid-message");
 const loginInvalidMessageText = loginInvalidMessage.textContent
 const registerInvalidMessage = document.querySelector(".register-invalid-message");
 const registerInvalidMessageText = registerInvalidMessage.textContent
+const backendDownMsg = document.querySelector(".backend-is-down-message");
 
 const chatBackBtn = document.querySelector(".chat-back-btn");
 const openChatBtn = document.querySelector(".chats-list-item");
@@ -137,31 +138,37 @@ function toggleForm(){
 
 async function checkAuthMe() {
 
-    const res = await fetch(SERVER_URL + "/auth/users/me", {
-        method: "GET", 
-        headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+    try{
+        const res = await fetch(SERVER_URL + "/auth/users/me", {
+            method: "GET", 
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            }
+        });
+
+        const data = await res.json();
+        console.log(res)
+        console.log(data)
+        const token = localStorage.getItem("token");
+        console.log(token)
+
+        if (res.ok) {
+            return data;
         }
-    });
 
-    const data = await res.json();
-    console.log(res)
-    console.log(data)
-    const token = localStorage.getItem("token");
-    console.log(token)
+        if (res.status === 401) {
+            chatContainer.classList.add("hide");
+            chatsListContainer.classList.add("hide");
 
-    if (res.ok) {
-        return data;
+            formsContainer.classList.remove("hide");
+            loginForm.classList.remove("hide");
+
+            localStorage.removeItem("token");
+            return false;
+        }
     }
-
-    if (res.status === 401) {
-        chatContainer.classList.add("hide");
-        chatsListContainer.classList.add("hide");
-
-        formsContainer.classList.remove("hide");
-        loginForm.classList.remove("hide");
-
-        localStorage.removeItem("token");
+    catch(e){
+        console.log("error:", e)
     }
 }
 
@@ -375,16 +382,21 @@ async function init(){
         chatContainer.classList.add("hide");
         chatsListContainer.classList.remove("hide");
     }
-
+    
     const checkMe = await checkAuthMe();
+    
+    if (checkMe == null) {
+        backendDownMsg.classList.remove("hide");
+    }
+    else {
+        myEmail.textContent = checkMe.email;
 
-    myEmail.textContent = checkMe.email;
+        getEmojiList();
 
-    getEmojiList();
+        getAllUsers();
 
-    getAllUsers();
-
-    registerForm.classList.add("hide");
+        registerForm.classList.add("hide");
+    }
 }
 
 init();

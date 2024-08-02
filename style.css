@@ -46,7 +46,7 @@
     text-align: center;
 }
 
-.login-form .login-invalid-message, .register-form .register-invalid-message{
+.login-form .login-invalid-message, .register-form .register-invalid-messag, .register-form .backend-is-down-message{
     border: 2px solid red;
     border-radius: 16px;
     padding: 16px;
